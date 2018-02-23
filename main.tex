@@ -340,7 +340,7 @@ array([0, 0, 1 ... 2771, 2773, 2773])
 \end{minted}
 
 \vspace{0.2 cm}
-{\normalsize There are also string types, vector of strings, vector of vector of numbers, etc. Eventually, uproot will be able to interpret any data type. To see if your branch's type is currently supported, open the file and call {\tt\small tree.show()}.}
+{\normalsize There are also string types, vector of strings, vector of vector of numbers, etc. Eventually, uproot will be able to interpret any data type. To see if your branch's type is currently supported, call {\tt\small tree.show()} and check the third column for {\tt\small None}.}
 
 \begin{minted}{python3}
 >>> tree.show()
@@ -498,7 +498,7 @@ tree->SetAutoFlush(-1024*1024 * numbranches);
 \end{minted}
 
 \vspace{0.75 cm}
-{\normalsize \ldots use LZ4 compression:}
+{\normalsize \ldots and use LZ4 compression:}
 
 \begin{minted}{c++}
 file->SetCompressionAlgorithm(ROOT::kLZ4);    // ROOT::kLZ4 is 4
@@ -514,7 +514,7 @@ Although Python locks all threads at each step in its interpreter, compiled code
 \includegraphics[width=0.65\linewidth]{scaling.png}
 \end{center}
 
-In the above, we iterated through a thousand lzma-compressed branches (which requires the most processing), distributed as described on page~\pageref{page:executor}.
+In the above, we iterated through a thousand lzma-compressed branches (lzma requires the most CPU time to decompress), distributed as described on page~\pageref{page:executor}.
 \end{frame}
 
 \begin{frame}[fragile]{Installation, repository, documentation, and community}
