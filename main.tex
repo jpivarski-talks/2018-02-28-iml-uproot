@@ -127,6 +127,8 @@ alice-rs/root-io & Rust & ALICE ecosystem in Rust & Christian Bourjau \\
 
 \begin{frame}{More context: BulkIO}
 \vspace{0.75 cm}
+\begin{center}
+\begin{minipage}{0.8\linewidth}
 Last summer, Brian Bockelman started a project called ``BulkIO'' to bypass the event processing framework in ROOT itself, providing direct access to branches as columns.
 
 \vspace{0.75 cm}
@@ -134,6 +136,8 @@ I added a BulkIO-to-Numpy interface in PyROOT in the same pull request [\textcol
 
 \vspace{0.75 cm}
 I wrote uproot while the pull request is in progress, based on the same BulkIO technique.
+\end{minipage}
+\end{center}
 \end{frame}
 
 \begin{frame}{}
@@ -336,7 +340,7 @@ array([0, 0, 1 ... 2771, 2773, 2773])
 \end{minted}
 
 \vspace{0.2 cm}
-{\normalsize There are also string types, vector of strings, vector of vector of numbers, etc. Eventually, uproot will be able to interpret any data type. To see if your branch's type is supported, open the file and call {\tt\small tree.show()}.}
+{\normalsize There are also string types, vector of strings, vector of vector of numbers, etc. Eventually, uproot will be able to interpret any data type. To see if your branch's type is currently supported, open the file and call {\tt\small tree.show()}.}
 
 \begin{minted}{python3}
 >>> tree.show()
