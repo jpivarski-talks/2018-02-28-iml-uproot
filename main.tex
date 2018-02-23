@@ -517,6 +517,35 @@ Although Python locks all threads at each step in its interpreter, compiled code
 In the above, we iterated through a thousand lzma-compressed branches (lzma requires the most CPU time to decompress), distributed as described on page~\pageref{page:executor}.
 \end{frame}
 
+\begin{frame}{}
+\begin{center}
+\Huge \textcolor{darkblue}{Closing remarks}
+\end{center}
+\end{frame}
+
+\begin{frame}{Status and future}
+\vspace{0.5 cm}
+\begin{center}
+\begin{minipage}{0.95\linewidth}
+\large
+\begin{itemize}\setlength{\itemsep}{0.5 cm}
+\item uproot has reached a stable plateau, I'm mostly responding to bugs and feature requests now--- no deep overhauls.
+\item This summer, Pratyush Das (undergrad) will be helping me add write support for file output.
+\item uproot will always be an I/O-only library. However, it may accrue features that {\it connect} it to other packages, such as
+
+\vspace{0.1 cm}
+{\tt\small tree.pandas.df()}
+
+\vspace{0.1 cm}
+and
+
+\vspace{0.1 cm}
+{\tt\small histogram.bokeh.plot()}.
+\end{itemize}
+\end{minipage}
+\end{center}
+\end{frame}
+
 \begin{frame}[fragile]{Installation, repository, documentation, and community}
 \vspace{0.5 cm}
 \huge
