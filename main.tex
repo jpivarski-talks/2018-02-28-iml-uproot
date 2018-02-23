@@ -30,7 +30,7 @@
 \definecolor{darkgreen}{rgb}{0,0.6,0}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
-\title[2018-02-28-iml-uproot]{\includegraphics[width=0.25\linewidth]{uproot-logo.pdf} \\ rapidly moving data from ROOT to Numpy and Pandas}
+\title[2018-02-28-iml-uproot]{\vspace{0.5 cm} \\ \includegraphics[width=0.25\linewidth]{uproot-logo.pdf} \\ Rapidly moving data from ROOT to Numpy and Pandas}
 \author{Jim Pivarski}
 \institute{Princeton University -- DIANA-HEP}
 \date{February 28, 2018}
@@ -52,9 +52,26 @@
 
 % START START START START START START START START START START START START START
 
-\begin{frame}{First slide}
+\begin{frame}{The what and why of uproot}
 \vspace{0.5 cm}
-HERE
+
+\begin{block}{What is uproot?}
+A pure Python $+$ Numpy implementation of ROOT I/O.
+\end{block}
+
+\vspace{0.5 cm}
+\begin{block}{Why does it exist?}
+\begin{enumerate}
+\item To extract columnar data (branches) from a ROOT file without invoking the event-handling infrastructure of the ROOT framework.
+\item As faster and fewer-dependencies alternative to root\_numpy and root\_pandas.
+\item To express the semantics and conventions of the ROOT file format independently of ROOT, in lieu of a formal specification.
+\end{enumerate}
+\end{block}
 \end{frame}
+
+\begin{frame}{Multiple implementations of the same format?}
+
+\end{frame}
+
 
 \end{document}
