@@ -63,7 +63,7 @@ A pure Python $+$ Numpy implementation of ROOT I/O.
 \begin{block}{Why does it exist?}
 \begin{enumerate}
 \item To extract columnar data (branches) from a ROOT file without invoking the event-handling infrastructure of the ROOT framework.
-\item As faster and fewer-dependencies alternative to root\_numpy and root\_pandas.
+\item As a faster and fewer-dependencies alternative to root\_numpy and root\_pandas.
 \item To express the semantics and conventions of the ROOT file format independently of ROOT, in lieu of a formal specification.
 \end{enumerate}
 \end{block}
@@ -102,8 +102,27 @@ alice-rs/root-io & Rust & ALICE ecosystem in Rust & Christian Bourjau \\
 \end{columns}
 \end{frame}
 
-\begin{frame}{}
+\begin{frame}{Why Python $+$ Numpy?}
+\vspace{0.25 cm}
+\begin{itemize}\setlength{\itemsep}{0.35 cm}
+\item Physicists are already using Python for data analysis.
 
+\begin{itemize}
+\item \textcolor{gray}{PyROOT has excellent coverage of the ROOT ecosystem. However, calling individually wrapped C++ methods from Python is slow and the two languages have different (often conflicting) memory management.}
+
+\item \textcolor{gray}{Performance-oriented tools like root\_numpy and root\_pandas compile into a specific version of ROOT, which complicates upgrades. Also, asking for arrays through interfaces designed for event processing is a severe performance penalty.}
+\end{itemize}
+
+\item The scientific Python ecosystem, including much of machine learning, is designed around a fundamental abstraction called the Numpy array.
+
+\item Working with computer scientists is easier when you can say, ``pip install uproot.''
+
+\item Implemented correctly, Python $+$ Numpy doesn't have to be slow.
+
+\begin{itemize}
+\item \textcolor{gray}{Finding the columnar data in a ROOT file may be done in slow Python, as long as decompression and array manipulations are done by compiled code.}
+\end{itemize}
+\end{itemize}
 \end{frame}
 
 
