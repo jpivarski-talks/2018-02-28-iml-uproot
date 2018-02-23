@@ -136,9 +136,132 @@ I added a BulkIO-to-Numpy interface in PyROOT in the same pull request [\textcol
 I wrote uproot while the pull request is in progress, based on the same BulkIO principle.
 \end{frame}
 
+%% \begin{frame}[fragile]{A tour of uproot}
+%% \vspace{0.35 cm}
+%% \small
+
+%% {\normalsize Download and install.}
+
+%% \begin{minted}{bash}
+%% $ pip install uproot --user
+%% $ wget http://scikit-hep.org/uproot/examples/Zmumu.root
+%% \end{minted}
+
+%% \vspace{0.2 cm}
+%% {\normalsize Start using it in Python.}
+
+%% \begin{minted}{python3}
+%% >>> import uproot
+%% >>> file = uproot.open("Zmumu.root")  # or root:// or http://
+%% \end{minted}
+
+%% \vspace{0.2 cm}
+%% {\normalsize ROOT files, directories, and trees are like Python dicts.}
+
+%% \begin{minted}{python3}
+%% >>> file.keys()
+%% ['events;1']
+%% >>> tree = file["events"]
+%% >>> tree.keys()
+%% ['Type', 'Run', 'Event', 'E1', 'px1', 'py1', 'pz1', 'pt1', 'eta1',
+%%  'phi1', 'Q1', 'E2', 'px2', 'py2', 'pz2', 'pt2', 'eta2', 'phi2',
+%%  'Q2', 'M']
+%% \end{minted}
+%% \end{frame}
+
+%% \begin{frame}[fragile]{A tour of uproot}
+%% \vspace{0.5 cm}
+%% \small
+
+%% {\normalsize Main purpose is to pull branches from the file as Numpy arrays.}
+
+%% \begin{minted}{python3}
+%% >>> tree["px1"].array()
+%% array([-41.195287,  35.118049,  35.118049, ...,  32.377491,
+%%         32.377491,  32.485393])
+
+%% >>> tree.arrays(["px1", "py1", "pz1"])
+%% {'px1': array([-41.195287,  35.118049,  35.118049, ...,  32.377491,
+%%                 32.377491,  32.485393]),
+%%  'py1': array([ 17.43324 , -16.570362, -16.570362, ...,   1.199405,
+%%                  1.199405,   1.20135 ]),
+%%  'pz1': array([-68.964961, -48.775246, -48.775246, ..., -74.532430,
+%%                -74.532430, -74.808372])}
+%% \end{minted}
+%% \end{frame}
+
+%% \begin{frame}[fragile]{A tour of uproot}
+%% \vspace{0.5 cm}
+%% \small
+
+%% {\normalsize Iteration lets us pull data in batches--- large enough to be efficient in Python but small enough to fit in memory.}
+
+%% \begin{minted}{python3}
+%% >>> for arrays in tree.iterate(entrysteps=10000):
+%% ...     do_something(arrays)   # all arrays, 10k event steps
+
+%% >>> for arrays in uproot.iterate("/path/to/files*.root", "Events"):
+%% ...     do_something(arrays)   # this is like a TChain
+%% \end{minted}
+
+%% \vspace{0.2 cm}
+%% {\normalsize The array-fetching methods share most parameters: you can specify a subset of branches in {\tt\small iterate} just as you would in {\tt\small arrays}.}
+
+%% \vspace{0.2 cm}
+%% {\normalsize If unspecified, {\tt\small entrysteps} defaults to the ROOT file's cluster size, reading in whole numbers of baskets.}
+%% \end{frame}
+
+\begin{frame}[fragile]{A tour of uproot}
+\vspace{0.5 cm}
+\small
+
+{\normalsize One of these array-fetching methods fills a Pandas DataFrame.}
+
+\begin{minted}{python3}
+>>> tree.pandas.df(["pt*", "eta*", "phi*"])
+          eta1      eta2      phi1      phi2      pt1      pt2
+0    -1.217690 -1.051390  2.741260 -0.440873  44.7322  38.8311
+1    -1.051390 -1.217690 -0.440873  2.741260  38.8311  44.7322
+2    -1.051390 -1.217690 -0.440873  2.741260  38.8311  44.7322
+3    -1.051390 -1.217690 -0.440873  2.741260  38.8311  44.7322
+...        ...       ...       ...       ...      ...      ...
+2300 -1.482700 -1.570440 -2.775240  0.037027  72.8781  32.3997
+2301 -1.570440 -1.482700  0.037027 -2.775240  32.3997  72.8781
+2302 -1.570440 -1.482700  0.037027 -2.775240  32.3997  72.8781
+2303 -1.570440 -1.482700  0.037027 -2.775240  32.3997  72.8781
+
+[2304 rows x 6 columns]
+\end{minted}
+
+\vspace{0.2 cm}
+{\normalsize Features like this are easy now that the core ROOT-reading functionality is in place.}
+\end{frame}
 
 
 
 
+
+
+\begin{frame}[fragile]{Installation, repository, documentation, and community}
+\vspace{0.5 cm}
+\huge
+\begin{center}
+\begin{minipage}{0.8\linewidth}
+\begin{verbatim}
+pip install uproot --user
+\end{verbatim}
+\end{minipage}
+
+\Large
+\vspace{1 cm}
+\href{https://github.com/scikit-hep/uproot}{\textcolor{blue}{https://github.com/scikit-hep/uproot}}
+
+\vspace{0.5 cm}
+\href{http://uproot.readthedocs.io}{\textcolor{blue}{http://uproot.readthedocs.io}}
+
+\vspace{0.5 cm}
+\href{https://groups.google.com/forum/#!forum/uproot-users/join}{\textcolor{blue}{https://groups.google.com/forum/\#!forum/uproot-users/join}}
+\end{center}
+\end{frame}
 
 \end{document}
