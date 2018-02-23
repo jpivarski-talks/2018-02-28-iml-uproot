@@ -136,11 +136,17 @@ I added a BulkIO-to-Numpy interface in PyROOT in the same pull request [\textcol
 I wrote uproot while the pull request is in progress, based on the same BulkIO technique.
 \end{frame}
 
+\begin{frame}{}
+\begin{center}
+\Huge \textcolor{darkblue}{A tour of uproot}
+\end{center}
+\end{frame}
+
 \begin{frame}[fragile]{A tour of uproot}
 \vspace{0.35 cm}
 \small
 
-{\normalsize Download and install.}
+{\normalsize Install uproot and download a sample file.}
 
 \begin{minted}{bash}
 $ pip install uproot --user
@@ -156,7 +162,7 @@ $ wget http://scikit-hep.org/uproot/examples/Zmumu.root
 \end{minted}
 
 \vspace{0.2 cm}
-{\normalsize ROOT files, directories, and trees are like Python dicts.}
+{\normalsize ROOT files, directories, and trees are like Python dicts with {\tt\small keys()} and {\tt\small values()}.}
 
 \begin{minted}{python3}
 >>> file.keys()
@@ -173,7 +179,7 @@ $ wget http://scikit-hep.org/uproot/examples/Zmumu.root
 \vspace{0.5 cm}
 \small
 
-{\normalsize Main purpose is to pull branches from the file as Numpy arrays.}
+{\normalsize uproot's main purpose is to read branches from ROOT files as Numpy arrays.}
 
 \begin{minted}{python3}
 >>> tree["px1"].array()
@@ -194,11 +200,11 @@ array([-41.195287,  35.118049,  35.118049, ...,  32.377491,
 \vspace{0.5 cm}
 \small
 
-{\normalsize Iteration lets us pull data in batches--- large enough to be efficient in Python but small enough to fit in memory.}
+{\normalsize Iteration lets us fetch data in batches--- large enough to be efficient in Python but small enough to fit in memory.}
 
 \begin{minted}{python3}
 >>> for arrays in tree.iterate(entrysteps=10000):
-...     do_something(arrays)   # all arrays, 10k event steps
+...     do_something(arrays)   # all arrays in chunks of 10k events
 
 >>> for arrays in uproot.iterate("/path/to/files*.root", "Events"):
 ...     do_something(arrays)   # this is like a TChain
@@ -208,7 +214,7 @@ array([-41.195287,  35.118049,  35.118049, ...,  32.377491,
 {\normalsize The array-fetching methods share most parameters: you can specify a subset of branches in {\tt\small iterate} just as you would in {\tt\small arrays}.}
 
 \vspace{0.2 cm}
-{\normalsize If unspecified, {\tt\small entrysteps} defaults to the ROOT file's cluster size, reading in whole numbers of baskets.}
+{\normalsize If unspecified, {\tt\small entrysteps} defaults to the ROOT file's cluster size, reading whole baskets at a time.}
 \end{frame}
 
 \begin{frame}[fragile]{A tour of uproot}
@@ -249,7 +255,7 @@ array([-41.195287,  35.118049,  35.118049, ...,  32.377491,
 \end{minted}
 
 \vspace{0.2 cm}
-{\normalsize That is, unless you give it a cache (anything that acts like a dict but may drop data).}
+{\normalsize That is, unless you give it a cache (anything that acts like a dict).}
 
 \begin{minted}{python3}
 >>> cache = {}
@@ -258,7 +264,7 @@ array([-41.195287,  35.118049,  35.118049, ...,  32.377491,
 >>> len(cache)
 20
 
->>> limitedcache = uproot.cache.MemoryCache(5*1024)    # cap at 5 kB
+>>> limitedcache = uproot.cache.MemoryCache(5*1024)   # limit to 5 kB
 >>> arrays = tree.arrays(cache=limitedcache)
 >>> len(limitedcache)
 18
@@ -298,8 +304,8 @@ array([-41.195287,  35.118049,  35.118049, ...,  32.377491,
 {\normalsize A lot of ROOT trees are not flat tables, but contain arbitrary-length lists of particle attributes. Numpy only deals with n-dimensional arrays, so we need a new container.}
 
 \begin{minted}{python3}
->>> url = "http://scikit-hep.org/uproot/examples/HZZ.root"
->>> tree = uproot.open(url)["events"]
+>>> tree = uproot.open("http://scikit-hep.org/uproot/"
+...                               "examples/HZZ.root")["events"]
 >>> ja = tree.array("Jet_E")
 >>> ja
 jaggedarray([[],
@@ -320,7 +326,7 @@ array([44.137363], dtype=float32)
 \vspace{0.4 cm}
 \small
 
-{\normalsize This is much faster than root\_numpy's behavior (arrays as objects in an object array) because uproot only loads the information needed to identify subarrays, which are contiguous in memory.}
+{\normalsize This is much faster than root\_numpy's behavior (arrays as objects in an object array) because uproot only loads the information needed to identify subarrays (contiguous in memory) without constructing them all (randomly in memory).}
 
 \begin{minted}{python3}
 >>> ja.content
@@ -407,6 +413,12 @@ $ wget "https://github.com/HEPData/hepdata-submission/blob/master/examples/submi
 [3, inf]     0    |                                                            |
                   +------------------------------------------------------------+
 \end{minted}
+\end{frame}
+
+\begin{frame}{}
+\begin{center}
+\Huge \textcolor{darkblue}{Performance}
+\end{center}
 \end{frame}
 
 \begin{frame}{Performance: comparison to root\_numpy (uncompressed)}
