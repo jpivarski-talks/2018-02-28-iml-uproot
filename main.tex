@@ -108,7 +108,7 @@ alice-rs/root-io & Rust & ALICE ecosystem in Rust & Christian Bourjau \\
 \item Physicists are already using Python for data analysis.
 
 \begin{itemize}
-\item \textcolor{gray}{PyROOT has excellent coverage of the ROOT ecosystem. However, calling individually wrapped C++ methods from Python is slow and the two languages have different (often conflicting) memory management.}
+\item \textcolor{gray}{PyROOT has excellent coverage of the ROOT ecosystem, but calling individually wrapped C++ methods from Python is slow and the two languages have different (often conflicting) memory management.}
 
 \item \textcolor{gray}{Performance-oriented tools like root\_numpy and root\_pandas compile into a specific version of ROOT, which complicates upgrades. Also, asking for arrays through interfaces designed for event processing is a severe performance penalty.}
 \end{itemize}
@@ -124,6 +124,21 @@ alice-rs/root-io & Rust & ALICE ecosystem in Rust & Christian Bourjau \\
 \end{itemize}
 \end{itemize}
 \end{frame}
+
+\begin{frame}{More context: BulkIO}
+\vspace{0.75 cm}
+Last summer, Brian Bockelman started a project called ``BulkIO'' to bypass the event processing framework in ROOT itself, providing direct access to branches as columns.
+
+\vspace{0.75 cm}
+I added a BulkIO-to-Numpy interface in PyROOT in the same pull request [\textcolor{blue}{\href{https://github.com/root-project/root/pull/943}{\#943}}] and intend to maintain it, when it's approved.
+
+\vspace{0.75 cm}
+I wrote uproot while the pull request is in progress, based on the same BulkIO principle.
+\end{frame}
+
+
+
+
 
 
 \end{document}
