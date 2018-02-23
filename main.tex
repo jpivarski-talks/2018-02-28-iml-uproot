@@ -125,16 +125,16 @@ alice-rs/root-io & Rust & ALICE ecosystem in Rust & Christian Bourjau \\
 \end{itemize}
 \end{frame}
 
-\begin{frame}{More context: BulkIO}
-\vspace{0.75 cm}
-Last summer, Brian Bockelman started a project called ``BulkIO'' to bypass the event processing framework in ROOT itself, providing direct access to branches as columns.
+%% \begin{frame}{More context: BulkIO}
+%% \vspace{0.75 cm}
+%% Last summer, Brian Bockelman started a project called ``BulkIO'' to bypass the event processing framework in ROOT itself, providing direct access to branches as columns.
 
-\vspace{0.75 cm}
-I added a BulkIO-to-Numpy interface in PyROOT in the same pull request [\textcolor{blue}{\href{https://github.com/root-project/root/pull/943}{\#943}}] and intend to maintain it, when it's approved.
+%% \vspace{0.75 cm}
+%% I added a BulkIO-to-Numpy interface in PyROOT in the same pull request [\textcolor{blue}{\href{https://github.com/root-project/root/pull/943}{\#943}}] and intend to maintain it, when it's approved.
 
-\vspace{0.75 cm}
-I wrote uproot while the pull request is in progress, based on the same BulkIO principle.
-\end{frame}
+%% \vspace{0.75 cm}
+%% I wrote uproot while the pull request is in progress, based on the same BulkIO principle.
+%% \end{frame}
 
 %% \begin{frame}[fragile]{A tour of uproot}
 %% \vspace{0.35 cm}
@@ -211,57 +211,390 @@ I wrote uproot while the pull request is in progress, based on the same BulkIO p
 %% {\normalsize If unspecified, {\tt\small entrysteps} defaults to the ROOT file's cluster size, reading in whole numbers of baskets.}
 %% \end{frame}
 
-\begin{frame}[fragile]{A tour of uproot}
-\vspace{0.5 cm}
-\small
+%% \begin{frame}[fragile]{A tour of uproot}
+%% \vspace{0.5 cm}
+%% \small
 
-{\normalsize One of these array-fetching methods fills a Pandas DataFrame.}
+%% {\normalsize One of these array-fetching methods fills a Pandas DataFrame.}
 
-\begin{minted}{python3}
->>> tree.pandas.df(["pt*", "eta*", "phi*"])
-          eta1      eta2      phi1      phi2      pt1      pt2
-0    -1.217690 -1.051390  2.741260 -0.440873  44.7322  38.8311
-1    -1.051390 -1.217690 -0.440873  2.741260  38.8311  44.7322
-2    -1.051390 -1.217690 -0.440873  2.741260  38.8311  44.7322
-3    -1.051390 -1.217690 -0.440873  2.741260  38.8311  44.7322
-...        ...       ...       ...       ...      ...      ...
-2300 -1.482700 -1.570440 -2.775240  0.037027  72.8781  32.3997
-2301 -1.570440 -1.482700  0.037027 -2.775240  32.3997  72.8781
-2302 -1.570440 -1.482700  0.037027 -2.775240  32.3997  72.8781
-2303 -1.570440 -1.482700  0.037027 -2.775240  32.3997  72.8781
+%% \begin{minted}{python3}
+%% >>> tree.pandas.df(["pt*", "eta*", "phi*"])
+%%           eta1      eta2      phi1      phi2      pt1      pt2
+%% 0    -1.217690 -1.051390  2.741260 -0.440873  44.7322  38.8311
+%% 1    -1.051390 -1.217690 -0.440873  2.741260  38.8311  44.7322
+%% 2    -1.051390 -1.217690 -0.440873  2.741260  38.8311  44.7322
+%% 3    -1.051390 -1.217690 -0.440873  2.741260  38.8311  44.7322
+%% ...        ...       ...       ...       ...      ...      ...
+%% 2300 -1.482700 -1.570440 -2.775240  0.037027  72.8781  32.3997
+%% 2301 -1.570440 -1.482700  0.037027 -2.775240  32.3997  72.8781
+%% 2302 -1.570440 -1.482700  0.037027 -2.775240  32.3997  72.8781
+%% 2303 -1.570440 -1.482700  0.037027 -2.775240  32.3997  72.8781
 
-[2304 rows x 6 columns]
-\end{minted}
+%% [2304 rows x 6 columns]
+%% \end{minted}
 
-\vspace{0.2 cm}
-{\normalsize Features like this are easy now that the core ROOT-reading functionality is in place.}
+%% \vspace{0.2 cm}
+%% {\normalsize Features like this are easy now that the core ROOT-reading functionality is in place.}
+%% \end{frame}
+
+%% \begin{frame}[fragile]{A tour of uproot}
+%% \vspace{0.5 cm}
+%% \small
+
+%% {\normalsize uproot follows Pythonic customs: high-level yet explicit. For example, asking for the same array twice reads it from the file twice.}
+
+%% \begin{minted}{python3}
+%% >>> arrays = tree.arrays()               # reads all data
+%% >>> arrays = tree.arrays()               # reads all data again
+%% \end{minted}
+
+%% \vspace{0.2 cm}
+%% {\normalsize That is, unless you give it a cache (anything that acts like a dict but may drop data).}
+
+%% \begin{minted}{python3}
+%% >>> cache = {}
+%% >>> arrays = tree.arrays(cache=cache)    # reads all data
+%% >>> arrays = tree.arrays(cache=cache)    # gets it from the cache
+%% >>> len(cache)
+%% 20
+
+%% >>> limitedcache = uproot.cache.MemoryCache(5*1024)    # cap at 5 kB
+%% >>> arrays = tree.arrays(cache=limitedcache)
+%% >>> len(limitedcache)
+%% 18
+%% \end{minted}
+%% \end{frame}
+
+%% \begin{frame}[fragile]{A tour of uproot}
+%% \label{page:executor}\vspace{0.5 cm}
+%% \small
+
+%% {\normalsize Same for concurrency: it's single-threaded unless you give it an executor (anything with a {\tt\small map} method returning a non-blocking generator of results).}
+
+%% \begin{minted}{python3}
+%% >>> from concurrent.futures import ThreadPoolExecutor
+
+%% >>> executor = ThreadPoolExecutor(8)           # 8 threads
+%% >>> arrays = tree.arrays(executor=executor)    # read, decompress all
+%%                                                # baskets in parallel
+%% \end{minted}
+
+%% \vspace{0.2 cm}
+%% {\normalsize There's also a non-blocking form that returns a function. Processing happens in the background until you call this function, which waits for and returns the array data.}
+
+%% \begin{minted}{python3}
+%% >>> wait = tree.arrays(executor=executor, blocking=False)
+%% >>> wait
+%% <function wait at 0x7a1d744515f0>
+%% >>> wait()                                     # now get the arrays
+%% ...
+%% \end{minted}
+%% \end{frame}
+
+%% \begin{frame}[fragile]{A tour of uproot}
+%% \vspace{0.4 cm}
+%% \small
+
+%% {\normalsize A lot of ROOT trees are not flat tables, but contain arbitrary-length lists of particle attributes. Numpy only deals with n-dimensional arrays, so we need a new container.}
+
+%% \begin{minted}{python3}
+%% >>> url = "http://scikit-hep.org/uproot/examples/HZZ.root"
+%% >>> tree = uproot.open(url)["events"]
+%% >>> ja = tree.array("Jet_E")
+%% >>> ja
+%% jaggedarray([[],
+%%              [44.137363],
+%%              [],
+%%              ...,
+%%              [55.95058],
+%%              [229.57799  33.92035],
+%%              []])
+%% >>> ja[0]
+%% array([], dtype=float32)
+%% >>> ja[1]
+%% array([44.137363], dtype=float32)
+%% \end{minted}
+%% \end{frame}
+
+%% \begin{frame}[fragile]{A tour of uproot}
+%% \vspace{0.4 cm}
+%% \small
+
+%% {\normalsize This is much faster than root\_numpy's behavior (arrays as objects in an object array) because uproot only loads the information needed to identify subarrays, which are contiguous in memory.}
+
+%% \begin{minted}{python3}
+%% >>> ja.content
+%% array([44.13, 230.34, 101.35 ... 55.95, 229.57, 33.92], dtype=float32)
+%% >>> ja.offsets
+%% array([0, 0, 1 ... 2771, 2773, 2773])
+%% \end{minted}
+
+%% \vspace{0.2 cm}
+%% {\normalsize There are also string types, vector of strings, vector of vector of numbers, etc. Eventually, uproot will be able to interpret any data type. To see if your branch's type is supported, open the file and call {\tt\small tree.show()}.}
+
+%% \begin{minted}{python3}
+%% >>> tree.show()
+%% NJet                (no streamer)       asdtype('>i4')
+%% Jet_E               (no streamer)       asjagged(asdtype('>f4'))
+%% Jet_ID              (no streamer)       asjagged(asdtype('>bool'))
+%% ...
+%% \end{minted}
+%% \end{frame}
+
+%% \begin{frame}[fragile]{A tour of uproot}
+%% \vspace{0.35 cm}
+%% \scriptsize
+
+%% \begin{columns}
+%% \column{1.1\linewidth}
+%% {\normalsize uproot uses a ROOT file's streamer info to know how to deserialize classes, staying abreast of changes. Thus, any type of object may be extracted from a ROOT file.}
+
+%% \begin{minted}{bash}
+%% $ wget "https://github.com/HEPData/hepdata-submission/blob/master/examples/submission/"\
+%% "TestHEPSubmission/root_file.root?raw=true" -O hepdata.root
+%% \end{minted}
+
+%% \begin{minted}{python3}
+%% >>> file = uproot.open("hepdata.root")
+%% >>> dict(file.classes())
+%% {'hpx;1': <class uproot.rootio.TH1F>, 'hpxpy;1': <class uproot.rootio.TH2F>,
+%%  'hprof;1': <class uproot.rootio.TProfile>, 'ntuple;1': <class uproot.rootio.TNtuple>}
+%% >>> histogram = file["hpx"]
+%% >>> histogram.fTitle
+%% 'This is the px distribution'
+%% >>> histogram.fFunctions[0]
+%% <TPaveStats 'stats' at 0x71cb4586df90>
+%% \end{minted}
+%% \begin{minted}{python3}
+%% >>> histogram.fXaxis.__dict__           # all the fields are there, without interpretation
+%% {'fTitleFont': 42, 'fLabelColor': 1, 'fNdivisions': 510, 'fXmin': -4.0,
+%%  'fTimeDisplay': False, 'classversion': 1, 'fLabelFont': 42, 'fNbins': 100,
+%%  'fLabels': None, 'fXbins': [], 'fTitleColor': 1, 'fLabelOffset': 0.004999999888241291,
+%%  'fName': 'xaxis', 'fLast': 0, 'fAxisColor': 1, 'fLabelSize': 0.03500000014901161,
+%%  'fTitleOffset': 1.0, 'fTitle': '', 'fFirst': 0, 'fXmax': 4.0,
+%%  'fTickLength': 0.029999999329447746, 'fTimeFormat': '', 'fBits2': 0,
+%%  'fTitleSize': 0.03500000014901161}
+%% \end{minted}
+%% \end{columns}
+%% \end{frame}
+
+%% \begin{frame}[fragile]{A tour of uproot}
+%% \vspace{0.4 cm}
+%% \scriptsize
+
+%% {\normalsize All that remains is to give these objects Pythonic interpretations.}
+
+%% \begin{minted}{python3}
+%% >>> histogram.bokeh.plot()            # basic implementation, somewhat clunky
+%% >>> histogram.holoviews.plot()        # only works in a Jupyter notebook
+
+%% >>> histogram.fit(lambda x, a, b, c: a*exp(-(x - b)**2 / c))    # dreaming...
+
+%% >>> histogram.show()                  # surprisingly useful
+%%                   0                                                       2410.8
+%%                   +------------------------------------------------------------+
+%% [-inf, -3)   0    |                                                            |
+%% [-3, -2.4)   68   |**                                                          |
+%% [-2.4, -1.8) 285  |*******                                                     |
+%% [-1.8, -1.2) 755  |*******************                                         |
+%% [-1.2, -0.6) 1580 |***************************************                     |
+%% [-0.6, 0)    2296 |*********************************************************   |
+%% [0, 0.6)     2286 |*********************************************************   |
+%% [0.6, 1.2)   1570 |***************************************                     |
+%% [1.2, 1.8)   795  |********************                                        |
+%% [1.8, 2.4)   289  |*******                                                     |
+%% [2.4, 3)     76   |**                                                          |
+%% [3, inf]     0    |                                                            |
+%%                   +------------------------------------------------------------+
+%% \end{minted}
+%% \end{frame}
+
+%% \begin{frame}{Performance: comparison to root\_numpy (uncompressed)}
+%% \vspace{0.4 cm}
+
+%% In terms of functionality, uproot is most similar to root\_numpy. Depending on basket size and whether the array is flat (fixed width per event) or jagged (variable width), uproot can be as much as 40 times faster.
+
+%% \begin{columns}
+%% \column{1.15\linewidth}
+%% \includegraphics[width=0.5\linewidth]{rootnumpy-none-met.png}
+%% \includegraphics[width=0.5\linewidth]{rootnumpy-none-muon.png}
+%% \end{columns}
+
+%% The 13 lines are different physics distributions from CMS NanoAOD (mileage varies). Speedup increases with basket size because more work is done in Numpy, not Python.
+%% \end{frame}
+
+%% \begin{frame}{Performance: comparison to root\_numpy (gzip-compressed)}
+%% \vspace{0.5 cm}
+
+%% The distinction drops to a factor of 3 when flat data are compressed, but still there's a factor of 10 for jagged data because of the way root\_numpy handles this type.
+
+%% \vspace{0.5 cm}
+%% \begin{columns}
+%% \column{1.15\linewidth}
+%% \includegraphics[width=0.5\linewidth]{rootnumpy-gzip-met.png}
+%% \includegraphics[width=0.5\linewidth]{rootnumpy-gzip-muon.png}
+%% \end{columns}
+%% \end{frame}
+
+%% \begin{frame}{Performance: comparison to ROOT (uncompressed)}
+%% \vspace{0.5 cm}
+
+%% For sufficiently large baskets, uproot even compares favorably to ROOT because uproot bypasses the event processing framework.
+
+%% \vspace{0.25 cm}
+%% \begin{columns}
+%% \column{1.15\linewidth}
+%% \includegraphics[width=0.5\linewidth]{root-none-met.png}
+%% \includegraphics[width=0.5\linewidth]{root-none-muon.png}
+%% \end{columns}
+
+%% \vspace{0.25 cm}
+%% When the BulkIO feature is added to ROOT, it will be about 30 times faster than this baseline, so ROOT {\tt\small TBranch::GetEntry} $\ll$ uproot $\ll$ ROOT BulkIO.
+%% \end{frame}
+
+%% \begin{frame}{Performance: comparison to ROOT (gzip-compressed)}
+%% \vspace{0.5 cm}
+%% As you add compression, the distinction washes out because both processes spend more of their time in the same decompression algorithm.
+
+%% \vspace{0.25 cm}
+%% \begin{columns}
+%% \column{1.15\linewidth}
+%% \includegraphics[width=0.5\linewidth]{root-gzip-met.png}
+%% \includegraphics[width=0.5\linewidth]{root-gzip-muon.png}
+%% \end{columns}
+
+%% \vspace{0.25 cm}
+%% For read performance, no compression $\sim$ lz4 $\ll$ gzip $\ll$ lzma.
+%% \end{frame}
+
+%% \begin{frame}[fragile]{If you are preparing data for uproot}
+%% \vspace{0.5 cm}
+%% \small
+
+%% {\normalsize \ldots make large baskets:}
+
+%% \begin{minted}{c++}
+%% // 100 kB to 1 MB baskets
+%% tree->Branch("branch", &data, "branch/F", 1024*1024);
+
+%% // negative flush size is size of all branches in a cluster
+%% tree->SetAutoFlush(-1024*1024 * numbranches);
+%% \end{minted}
+
+%% \vspace{0.75 cm}
+%% {\normalsize \ldots use LZ4 compression:}
+
+%% \begin{minted}{c++}
+%% file->SetCompressionAlgorithm(ROOT::kLZ4);    // ROOT::kLZ4 is 4
+%% file->SetCompressionLevel(3);
+%% \end{minted}
+%% \end{frame}
+
+%% \begin{frame}{Last performance plot: multithreaded scaling}
+%% \vspace{0.5 cm}
+%% Although Python locks all threads at each step in its interpreter, compiled code escapes this limitation and can scale on multicore machines.
+
+%% \begin{center}
+%% \includegraphics[width=0.65\linewidth]{scaling.png}
+%% \end{center}
+
+%% In the above, we iterated through a thousand lzma-compressed branches (which requires the most processing), distributed as described on page~\pageref{page:executor}.
+%% \end{frame}
+
+%% \begin{frame}[fragile]{Installation, repository, documentation, and community}
+%% \vspace{0.5 cm}
+%% \huge
+%% \begin{center}
+%% \begin{minipage}{0.8\linewidth}
+%% \begin{verbatim}
+%% pip install uproot --user
+%% \end{verbatim}
+%% \end{minipage}
+
+%% \Large
+%% \vspace{1 cm}
+%% \href{https://github.com/scikit-hep/uproot}{\textcolor{blue}{https://github.com/scikit-hep/uproot}}
+
+%% \vspace{0.5 cm}
+%% \href{http://uproot.readthedocs.io}{\textcolor{blue}{http://uproot.readthedocs.io}}
+
+%% \vspace{0.5 cm}
+%% \href{https://groups.google.com/forum/#!forum/uproot-users/join}{\textcolor{blue}{https://groups.google.com/forum/\#!forum/uproot-users/join}}
+%% \end{center}
+%% \end{frame}
+
+\begin{frame}{}
+\begin{center}
+\Huge \textcolor{darkblue}{BACKUP}
+\end{center}
 \end{frame}
 
+\begin{frame}[fragile]{Code used for performance studies}
+\vspace{0.25 cm}
+\small
 
+\begin{minted}{bash}
+$ vmtouch -t filename   # ensure the whole file is in VM cache
+\end{minted}
 
+\begin{minted}{python}
+import uproot
 
+tree = uproot.open(filename)[treename]
 
+startTime = time.time()
+tree.array(branchname)
+return time.time() - startTime
+\end{minted}
 
-\begin{frame}[fragile]{Installation, repository, documentation, and community}
-\vspace{0.5 cm}
-\huge
-\begin{center}
-\begin{minipage}{0.8\linewidth}
-\begin{verbatim}
-pip install uproot --user
-\end{verbatim}
-\end{minipage}
+\begin{minted}{python}
+import root_numpy
 
-\Large
-\vspace{1 cm}
-\href{https://github.com/scikit-hep/uproot}{\textcolor{blue}{https://github.com/scikit-hep/uproot}}
+file = ROOT.TFile(filename)
+tree = file.Get(treename)
 
-\vspace{0.5 cm}
-\href{http://uproot.readthedocs.io}{\textcolor{blue}{http://uproot.readthedocs.io}}
+startTime = time.time()
+root_numpy.tree2array(tree, [branchname])
+return time.time() - startTime
+\end{minted}
 
-\vspace{0.5 cm}
-\href{https://groups.google.com/forum/#!forum/uproot-users/join}{\textcolor{blue}{https://groups.google.com/forum/\#!forum/uproot-users/join}}
-\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Code used for performance studies}
+\vspace{0.25 cm}
+\scriptsize
+
+\begin{minted}{c++}
+TFile *file = new TFile(filename);
+TTree *tree;
+file->GetObject(treename, tree);
+
+float MET_pt;
+float Muon_pt[8];
+tree->SetBranchAddress("MET_pt", &MET_pt);
+tree->SetBranchAddress("Muon_pt", &Muon_pt);
+
+TBranch *branch;
+if (branchname == "Muon_pt") {
+  branch = treein->GetBranch("Muon_pt");
+}
+else if (branchname == "MET_pt") {
+  branch = treein->GetBranch("MET_pt");
+}
+
+struct timeval startTime, endTime;
+
+Long64_t nEvents = tree->GetEntries();
+Long64_t iEvent;
+gettimeofday(&startTime, 0);
+for (iEvent = 0;  iEvent < nEvents;  ++iEvent) {
+    // not tree->GetEntry(iEvent) because that scans over all branches!
+    branch->GetEntry(iEvent);
+}
+gettimeofday(&endTime, 0);
+
+return (1000000 * (endTime.tv_sec - startTime.tv_sec) + (endTime.tv_usec - startTime.tv_usec)) / 1000000.0;
+\end{minted}
 \end{frame}
 
 \end{document}
