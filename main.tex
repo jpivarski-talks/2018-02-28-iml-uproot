@@ -70,6 +70,39 @@ A pure Python $+$ Numpy implementation of ROOT I/O.
 \end{frame}
 
 \begin{frame}{Multiple implementations of the same format?}
+\vspace{0.25 cm}
+\begin{columns}
+\column{0.73\linewidth}
+\includegraphics[width=\linewidth]{formats.pdf}
+\column{0.25\linewidth}
+It's more common to define a specification and implement many interpreters than not.
+
+\vspace{0.25 cm}
+Most connect the format to different contexts, such as different languages.
+
+\vspace{0.25 cm}
+\small\textcolor{gray}{(Take these numbers with a grain of salt: HDF5 is {\it criticized} because many of its bindings depend on only two C libraries!)}
+\end{columns}
+\end{frame}
+
+\begin{frame}{ROOT I/O implementations}
+\vspace{0.25 cm}
+\begin{columns}
+\column{1.2\linewidth}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{p{2.4 cm} c p{4.7 cm} p{5.25 cm}}
+\centering ROOT & C++ & ROOT itself & The ROOT Team \\
+\centering FreeHEP I/O $\to$ spark-root & Java/Scala & For Spark and other Big Data projects that run on Java & Started by Tony Johnson in 2001, updated by Viktor Khristenko \\
+\centering RIO $\to$ inlib/exlib & C++ & Intended as an alternative, now embedded in GEANT-4 & Guy Barrand \\
+\centering JsRoot & Javascript & For interacting with ROOT in web browsers or standalone & Bertrand Bellenot, Sergey Linev (in the ROOT Team) \\
+\centering go-hep/rootio & Go & HEP analysis ecosystem in Go & Sebastien Binet \\
+\centering \textcolor{blue}{uproot} & \textcolor{blue}{Python} & \textcolor{blue}{For quickly getting ROOT data into Numpy and Pandas for machine learning} & \textcolor{blue}{Jim Pivarski (me)} \\
+alice-rs/root-io & Rust & ALICE ecosystem in Rust & Christian Bourjau \\
+\end{tabular}
+\end{columns}
+\end{frame}
+
+\begin{frame}{}
 
 \end{frame}
 
