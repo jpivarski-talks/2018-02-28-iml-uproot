@@ -69,7 +69,7 @@ A pure Python $+$ Numpy implementation of ROOT I/O.
 \end{block}
 \end{frame}
 
-\begin{frame}{Multiple implementations of the same format?}
+\begin{frame}{Why reimplement ROOT I/O?}
 \vspace{0.25 cm}
 \begin{columns}
 \column{0.73\linewidth}
@@ -309,7 +309,7 @@ array([-41.195287,  35.118049,  35.118049, ...,  32.377491,
 
 \begin{minted}{python3}
 >>> tree = uproot.open("http://scikit-hep.org/uproot/"
-...                               "examples/HZZ.root")["events"]
+...                           "examples/HZZ.root")["events"]
 >>> ja = tree.array("Jet_E")
 >>> ja
 jaggedarray([[],
@@ -508,7 +508,7 @@ file->SetCompressionLevel(3);
 
 \begin{frame}{Last performance plot: multithreaded scaling}
 \vspace{0.5 cm}
-Although Python locks all threads at each step in its interpreter, compiled code escapes this limitation and can scale on multicore machines.
+Although Python locks all threads at each step in its interpreter (the ``GIL''), compiled code escapes this limitation and can scale on multicore machines.
 
 \begin{center}
 \includegraphics[width=0.65\linewidth]{scaling.png}
@@ -553,7 +553,7 @@ GitHub issues not posted by me: 33; \ stars: 72; \ watchers: 10.
 \large
 \begin{itemize}\setlength{\itemsep}{0.5 cm}
 \item uproot has reached a stable plateau, I'm mostly responding to bugs and feature requests now--- no deep overhauls.
-\item This summer, Pratyush Das (undergrad) will be helping me add write support for file output.
+\item This summer, Pratyush Das (an undergrad) will be adding write support for file output.
 \item uproot will always be an I/O-only library. However, it may accrue features that {\it connect} it to other packages, such as
 
 \vspace{0.2 cm}
@@ -572,7 +572,23 @@ which can eventually make it part of a Pythonic analysis environment.
 \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{Installation, repository, documentation, and community}
+\begin{frame}{Status and future}
+\vspace{0.5 cm}
+\begin{center}
+\begin{minipage}{0.8\linewidth}
+Yesterday, Chris Burr implemented a pyparsing-based translator from ROOT's TFormula language to numexpr. This would make it possible for uproot to reproduce all functionality currently found in root\_numpy.
+
+\vspace{0.5 cm}
+Is there interest in
+\begin{center}
+\tt import uproot.root\_numpy as root\_numpy
+\end{center}
+as a drop-in replacement?
+\end{minipage}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Last slide: thanks for listening!}
 \vspace{0.5 cm}
 \huge
 \begin{center}
